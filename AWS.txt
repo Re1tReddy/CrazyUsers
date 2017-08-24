@@ -1,0 +1,195 @@
+
+http://34.230.100.5:8080/crazyusers/login
+
+
+wget http://redrockdigimark.com/apachemirror/tomcat/tomcat-8/v8.5.16/bin/apache-tomcat-8.5.16.tar.gz
+tar -xzvf apache-tomcat-8.5.16.tar.gz
+
+export CATALINA_HOME=/home/ubuntu/apps/tomcat 
+
+ apps/tomcat/bin/catalina.sh run
+
+ nohup apps/tomcat/bin/startup.sh&
+ 
+ nohup apps/tomcat/bin/catalina.sh run&
+ 
+ rm -r apps/tomcat/webapps/wishes*
+ 
+ alias ts='
+/home/ubuntu/apps/tomcat/bin/catalina.sh' run
+
+mysql --user=ubuntu --password=Root@123 demo
+
+Creating A Backup:
+mysqldump --user=ubuntu --password=Root@123 demo >demodb-Aug-24.sql
+
+Restoring a Backup:
+mysql --user=ubuntu --password=Root@123 demo < demodb-Aug-24.sql
+
+scp -o StrictHostKeyChecking=no -i ~/.ssh/nodekeypair.pem /Users/revanthreddy/Project/crazyusers/target/crazyusers.war ubuntu@ec2-34-230-100-5.compute-1.amazonaws.com:/home/ubuntu/apps/tomcat/webapps/
+
+
+scp -r -o StrictHostKeyChecking=no -i ~/.ssh/nodekeypair.pem ubuntu@ec2-34-230-100-5.compute-1.amazonaws.com:/home/ubuntu/demodb-Aug-24.sql /Users/revanthreddy/Desktop/Notes/
+
+
+rm -r /usr/local/Cellar/tomcat/8.5.16_1/libexec/webapps/crazyusers*
+cp /Users/revanthreddy/Project/crazyusers/target/crazyusers.war /usr/local/Cellar/tomcat/8.5.16_1/libexec/webapps
+/usr/local/Cellar/tomcat/8.5.16_1/bin/catalina run
+
+
+
+nohup /usr/local/Cellar/tomcat/8.5.16_1/bin/startup.sh&
+
+nohup /usr/local/Cellar/tomcat/8.5.16_1/bin/catalina run&
+
+http://192.168.43.108:8080/wishes/
+
+http://ec2-34-230-100-5.compute-1.amazonaws.com:8080/wishes/
+
+drop table APP_USER_USER_PROFILE;
+drop table APP_USER;
+
+select id,sso_id,dob,mobile from APP_USER;
+
+drop database demo; 
+CREATE DATABASE demo;
+
+/*All User's gets stored in APP_USER table*/
+create table APP_USER (
+   id BIGINT NOT NULL AUTO_INCREMENT,
+   sso_id VARCHAR(30) NOT NULL,
+   password VARCHAR(100) NOT NULL,
+   first_name VARCHAR(30) NOT NULL,
+   last_name  VARCHAR(30) NOT NULL,
+   sex VARCHAR(1)  NOT NULL,
+   email VARCHAR(30) NOT NULL,
+   dob VARCHAR(30) NOT NULL,
+   created_date datetime NOT NULL,
+   PRIMARY KEY (id),
+   UNIQUE (sso_id)
+);
+
+SELECT id, sso_id, password,first_name,last_name,sex,email,dob,created_date FROM APP_USER INTO OUTFILE 'APP_USER.txt';
+
+ALTER TABLE APP_USER MODIFY email VARCHAR(100);
+
+ALTER TABLE APP_USER DROP COLUMN mobile;
+ALTER TABLE APP_USER ADD mobile BIGINT(10) DEFAULT 9901972233;
+
+
+CREATE TABLE TASKS (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    event_name varchar(30) NOT NULL,
+    template_name varchar(30) NOT NULL,
+    event_date VARCHAR(30) NOT NULL,
+    image_name VARCHAR(30) NOT NULL,
+    message VARCHAR(1000) NOT NULL,
+    PRIMARY KEY (id)
+	);
+	
+	CREATE TABLE WEDDING (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    husband_name varchar(30) NOT NULL,
+    wife_name varchar(30) NOT NULL,
+    template_name varchar(30) NOT NULL,
+    wedding_date VARCHAR(30) NOT NULL,
+    image_name VARCHAR(30) NOT NULL,
+    message VARCHAR(1000) NOT NULL,
+    email VARCHAR(40) NOT NULL,
+    PRIMARY KEY (id)
+	);
+	
+INSERT INTO WEDDING(husband_name,wife_name,template_name,wedding_date,image_name,message,email) VALUES ('Revanth1','Aruna1','fm_WeddingDayTemplate.txt','2017-08-18','WeddingDay.jpg','Happy Wedding Anniversary!','re1t.sr@gmail.com');
+
+select * from WEDDING;
+
+UPDATE TASKS SET event_date = '2017-08-25' WHERE id = 3;
+
+ 
+INSERT INTO TASKS(event_name,template_name,event_date,image_name,message) VALUES ('Independence Day','fm_IndependenceDayTemplate.txt','1947-08-14','IndependesDay.jpg','Happy Independence Day!');
+
+INSERT INTO TASKS(event_name,template_name,event_date,image_name,message) VALUES ('Ganesh Chaturthi','fm_GaneshChaturthiTemplate.txt','2017-08-25','GaneshChaturthi.jpg','Wishing You Happy Ganesh Chaturthi !');
+
+INSERT INTO TASKS(event_name,template_name,event_date,image_name,message) VALUES ('Dussehra','fm_DussehraTemplate.txt','2017-09-29','dussehra.jpg','Wishing You Happy Dussehra !');
+
+   
+   
+
+ALTER TABLE APP_USER
+ADD sex VARCHAR(1);
+
+UPDATE APP_USER SET sex = 'M' WHERE id = 3;
+
+UPDATE APP_USER SET dob = '1988-08-17' WHERE id = 18;
+   
+/* USER_PROFILE table contains all possible roles */ 
+create table USER_PROFILE(
+   id BIGINT NOT NULL AUTO_INCREMENT,
+   type VARCHAR(30) NOT NULL,
+   PRIMARY KEY (id),
+   UNIQUE (type)
+);
+   
+/* JOIN TABLE for MANY-TO-MANY relationship*/  
+CREATE TABLE APP_USER_USER_PROFILE (
+    user_id BIGINT NOT NULL,
+    user_profile_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, user_profile_id),
+    CONSTRAINT FK_APP_USER FOREIGN KEY (user_id) REFERENCES APP_USER (id),
+    CONSTRAINT FK_USER_PROFILE FOREIGN KEY (user_profile_id) REFERENCES USER_PROFILE (id)
+);
+  
+/* Populate USER_PROFILE Table */
+
+INSERT INTO USER_PROFILE(type)
+VALUES ('USER');
+  
+INSERT INTO USER_PROFILE(type)
+VALUES ('ADMIN');
+  
+INSERT INTO USER_PROFILE(type)
+VALUES ('DBA');
+  
+  
+/* Populate one Admin User which will further create other users for the application using GUI */
+INSERT INTO APP_USER(sso_id, password, first_name, last_name,sex, email,dob,created_date)
+VALUES ('re1t','$2a$10$4eqIF5s/ewJwHK1p8lqlFOEm2QIA0S8g6./Lok.pQxqcxaBZYChRm', 'Revanth','Reddy','M','re1t@gmail.com','1988-08-30', current_timestamp());
+  
+  
+/* Populate JOIN Table */
+INSERT INTO APP_USER_USER_PROFILE (user_id, user_profile_id)
+  SELECT user.id, profile.id FROM APP_USER user, USER_PROFILE profile
+  where user.sso_id='re1t' and profile.type='ADMIN';
+ 
+/* Create demo.PERSISTENT_LOGINS Table used to store rememberme related stuff*/
+CREATE TABLE demo.PERSISTENT_LOGINS (
+    username VARCHAR(64) NOT NULL,
+    series VARCHAR(64) NOT NULL,
+    token VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP NOT NULL,
+    PRIMARY KEY (series)
+);
+
+ /usr/local/Cellar/tomcat/8.5.16_1/bin/catalina run
+ 
+ 
+nohup /home/ubuntu/apps/tomcat/bin/catalina run &
+
+
+CREATE USER 'ubuntu'@'localhost' IDENTIFIED BY 'Root@123';
+GRANT ALL ON demo.* TO 'ubuntu'@'localhost';
+FLUSH PRIVILEGES;
+
+INSERT INTO APP_USER(sso_id, password, first_name, last_name,sex, email,dob,created_date)
+VALUES ('re1t1','$2a$10$4eqIF5s/ewJwHK1p8lqlFOEm2QIA0S8g6./Lok.pQxqcxaBZYChRm', 'Revanth','Reddy','M','re1t@gmail.com','1988-08-30', current_timestamp());
+INSERT INTO APP_USER(sso_id, password, first_name, last_name,sex, email,dob,created_date)
+VALUES ('re1t2','$2a$10$4eqIF5s/ewJwHK1p8lqlFOEm2QIA0S8g6./Lok.pQxqcxaBZYChRm', 'Revanth','Reddy','M','re1t@gmail.com','1988-08-30', current_timestamp());
+INSERT INTO APP_USER(sso_id, password, first_name, last_name,sex, email,dob,created_date)
+VALUES ('re1t3','$2a$10$4eqIF5s/ewJwHK1p8lqlFOEm2QIA0S8g6./Lok.pQxqcxaBZYChRm', 'Revanth','Reddy','M','re1t@gmail.com','1988-08-30', current_timestamp());
+INSERT INTO APP_USER(sso_id, password, first_name, last_name,sex, email,dob,created_date)
+VALUES ('re1t4','$2a$10$4eqIF5s/ewJwHK1p8lqlFOEm2QIA0S8g6./Lok.pQxqcxaBZYChRm', 'Revanth','Reddy','M','re1t@gmail.com','1988-08-30', current_timestamp());
+
+INSERT INTO APP_USER(sso_id, password, first_name, last_name,sex, email,dob,created_date)
+VALUES ('yeshwanth','$2a$10$4eqIF5s/ewJwHK1p8lqlFOEm2QIA0S8g6./Lok.pQxqcxaBZYChRm', ' Yeshwanth  ','Kaligiri','M','yeshwanth.kalligeri89@gmail.com','1989-07-15', current_timestamp());
+
+
