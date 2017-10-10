@@ -1,5 +1,8 @@
 # CrazyUsers
-My Web Application --> http://34.230.100.5:8080/crazyusers/login                  
+My Web Application --> http://34.230.100.5:8080/crazyusers/login    
+
+![CrazyUsers](https://github.com/Re1tReddy/Docs/blob/master/crazyusers.png)
+
 
 This Application is developed based on the following stack.
 -----------------------------------------------------------
