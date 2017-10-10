@@ -1,6 +1,5 @@
 # CrazyUsers
-My Web Application --> http://34.230.100.5:8080/crazyusers/login    
-
+My Web Application --> <a href="http://34.230.100.5:8080/crazyusers/login">Login</a>  
 ![CrazyUsers](https://github.com/Re1tReddy/Docs/blob/master/crazyusers.png)
 
 
